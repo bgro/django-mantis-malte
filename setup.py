@@ -24,7 +24,7 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='Mantis MALTE',
+    name='mantis_malte',
     version=version,
     description="""Machine learning for threat intelligence""",
     long_description=readme + '\n\n' + history,
