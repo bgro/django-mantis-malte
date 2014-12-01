@@ -32,11 +32,12 @@ class FactTermWeightEdit(ListView,LoginRequiredMixin):
         return context
 
     def get(self, request, *args, **kwargs):
+        #TODO paginate factterms
         print("Entering GET METHOD")
         initial = []
 
 
-        for row in self.queryset.values('term','factterm_set__weight'):
+        for row in self.queryset.order_by('term').values('term','factterm_set__weight'):
             if row['term'] != '':
                 initial.append({
                     'fact_term' : row['term'],
@@ -75,6 +76,7 @@ class FactTermWeightEdit(ListView,LoginRequiredMixin):
         return self.get(request, *args, **kwargs)
 
 class InfoObjectCorrelationView(DetailView, LoginRequiredMixin):
+    #TODO list view with correlation
     model = InfoObject
     threshold = 0.4
 
@@ -83,11 +85,15 @@ class InfoObjectCorrelationView(DetailView, LoginRequiredMixin):
         return context
 
     def get_facts(self):
+        #TODO get all associated facts which weight is bigger than defined threshold in self.threshold
         pk = self.kwargs['pk']
         facts = []
 
         def get_facts_rec():
-            facts = FactTerm.objects.filter(factterm_set__weight__gte=self.threshold,fact__iobject_thru__iobject=pk).values_list('fact__id')
+            facts = FactTerm.objects.filter(fact__iobject_thru__iobject=pk).values_list(*['fact__id','fact__value_iobject_id'])
+            #TODO value_iobject_id != none --> go on with collecting facts...
+            #TODO value_iobject_id == none --> fact_value prüfen...
+            #factterm_set__weight__gte=self.threshold,
             print "#############"
             print facts.query
             print facts
@@ -97,6 +103,12 @@ class InfoObjectCorrelationView(DetailView, LoginRequiredMixin):
 
     def get(self, request, *args, **kwargs):
         self.get_facts()
+        #TODO template context
+        #TODO create template (InfoObjects which could correlate; Package containing them; correlating facts)
+
+
+#TODO Bernd: Multiple Values in DB; Algo resursive search and then join?
+
 
 
 
