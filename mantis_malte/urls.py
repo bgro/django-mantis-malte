@@ -8,12 +8,12 @@ urlpatterns = patterns('',
 
     #TODO Correlation View for single Infobject
     url(r'^View/Correlation/(?P<pk>\d*)$',
-        views.FactTermWeightEdit.as_view(),
-        name="url.dingos.list.infoobject.generic"),
+        views.InfoObjectCorrelationView.as_view(),
+        name="url.mantis_malte.view.corr.infoobject"),
 
     url(r'^View/Correlation/Config/$',
         views.FactTermWeightEdit.as_view(),
-        name="url.mantis_malte.corr.config"),
+        name="url.mantis_malte.view.corr.config"),
     )
 
 

@@ -1,0 +1,8 @@
+/**FactTerm Weight Edit**/
+#weight-edit {
+    width:70%;
+}
+
+input[id$="fact_term"] {
+    width:300px;
+}

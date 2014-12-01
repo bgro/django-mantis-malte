@@ -1,0 +1,41 @@
+{% extends "mantis_malte/grappelli/base.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content_title %}
+  <h1>{{ title }}</h1>
+{% endblock %}
+
+{% block content %}
+    <form id="fact-term-weight-edit" action="" method="post">{% csrf_token %}
+    <div class="grp-group grp-tabular" id="weight-edit">
+        <h2>H2 Headline</h2>
+        <div class="grp-module grp-table">
+            <div class="grp-module grp-thead">
+                <div class="grp-tr">
+                    <div class="grp-th">Fact Term</div>
+                    <div class="grp-th">Weight</div>
+                </div>
+            </div>
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div class="grp-module grp-tbody grp-dynamic-form">
+                    <div class="grp-tr">
+                        <div class="grp-td">
+                            {{form.fact_term}}
+                        </div>
+                        <div class="grp-td">
+                            {{form.weight}}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <footer>
+        <input type="submit" name="update_weight" class="grp-button grp-default" value="Save">
+    </footer>
+    </form>
+{% endblock %}
