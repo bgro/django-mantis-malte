@@ -100,7 +100,6 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pk = [self.get_object().pk]
-        #TODO get_machting_facts annotated graph
         matching_facts = self.get_matching_facts(pk)
         context['cfacts'] = self.get_correlating_iobj(matching_facts,pk)
         return context
@@ -109,32 +108,16 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
         '''
         retrieving all associated facts which weight is bigger than defined threshold in self.threshold
         '''
-        pks_visited = set()
-        facts_matching = []
+        graph_traversal_kargs = {'max_nodes':0,
+                                 'direction':'down',
+                                 #'keep_graph_info': False,
+                                 'iobject_pks': pk}
+        G = follow_references(**graph_traversal_kargs)
+        pfr_list = []
 
-        def get_facts_rec(pks_to_query):
-            columns = ['fact__id','fact__value_iobject_id','factterm_set__weight']
-            facts_qs = FactTerm.objects.filter(fact__iobject_thru__iobject__in=pks_to_query).distinct('fact__id').values(*columns)
-            pks_visited.update(pks_to_query)
-            pks_to_visit = set()
-
-            for fact in facts_qs:
-                fact_id = fact['fact__id']
-                viobj_id = fact['fact__value_iobject_id']
-                weight = fact['factterm_set__weight']
-
-                if viobj_id and viobj_id not in pks_visited:
-                    pks_to_visit.add(viobj_id)
-                else:
-                    if weight and weight >= self.threshold:
-                        facts_matching.append(fact_id)
-
-            if pks_to_visit:
-                return get_facts_rec(pks_to_visit)
-            else:
-                return facts_matching
-
-        return get_facts_rec(pk)
+        io2fvs= vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False).prefetch_related(*pfr_list).filter(factterm__factterm_set__weight__gte=self.threshold)
+        facts_matching = [x.fact_id for x in io2fvs]
+        return facts_matching
 
     def get_correlating_iobj(self, facts, source_pk):
         if facts:
