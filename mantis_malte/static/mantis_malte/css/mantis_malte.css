@@ -1,5 +1,22 @@
-/**FactTerm Weight Edit**/
-#weight-edit {
+/**helpers**/
+.border-top {
+    border-top: solid #000 1px;
+}
+
+.border-right {
+    border-right: solid #000 1px;
+}
+
+.border-bottom {
+    border-bottom: solid #000 1px;
+}
+
+.border-left {
+    border-left: solid #000 1px;
+}
+
+/**correlation view/edit**/
+#weight-edit, #correlation-view  {
     width:70%;
 }
 

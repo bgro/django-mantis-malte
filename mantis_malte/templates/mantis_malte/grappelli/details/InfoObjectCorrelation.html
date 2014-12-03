@@ -1,0 +1,50 @@
+{% extends "mantis_malte/grappelli/base.html" %}
+
+{% load dingos_tags %}
+
+{% block title %}
+    {{ object.iobject_type.name }}
+{% endblock %}
+
+{% block content_title %}
+  <h1>{{ object.name }}</h1>
+{% endblock %}
+
+
+{% block content %}
+<div id="correlation-view">
+    {% show_InfoObjectIDData object %}
+    <div class="grp-module grp-collapse grp-open">
+        <h2 class="grp-collapse-handler">Possible Correlating Facts</h2>
+        <table class="grp-full-width">
+        {% for cfact in cfacts %}
+                <tr class="grp-row">
+                    <th>
+                        <label>Fact Value</label>
+                    </th>
+                    <td>
+                        {% for value in cfact.fact.fact_values.all %}
+                            {{ value }}
+                        {% endfor %}
+                    </td>
+                    <th rowspan="2" class="border-bottom">
+                        <label>Embedded in</label>
+                    </th>
+                    <td rowspan="2" class="border-bottom">
+                        <a href="{%url 'url.dingos.view.infoobject' pk=cfact.iobject.pk %}">{{ cfact.iobject.name }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="border-bottom">
+                        <label>Fact Term</label>
+                    </th>
+                    <td class="border-bottom">
+                       {{ cfact.fact.fact_term }}
+                    </td>
+                </tr>
+
+        {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

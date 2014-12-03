@@ -6,13 +6,17 @@ from django.forms.formsets import formset_factory
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
-from dingos.models import FactTerm, InfoObject, InfoObject2Fact, Fact
+from dingos.models import FactTerm, InfoObject, InfoObject2Fact, Fact, vIO2FValue
 
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
 
-class FactTermWeightEdit(ListView,LoginRequiredMixin):
+
+from datetime import datetime
+from dingos.graph_traversal import follow_references
+
+class FactTermWeightEdit(LoginRequiredMixin, ListView):
     model = FactTerm
 
     template_name = 'mantis_malte/%s/edits/FactTermWeightEdit.html' % MANTIS_MALTE_TEMPLATE_FAMILY
@@ -87,16 +91,18 @@ class FactTermWeightEdit(ListView,LoginRequiredMixin):
                             continue
         return self.get(request, *args, **kwargs)
 
-class InfoObjectCorrelationView(DetailView, LoginRequiredMixin):
+class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     #TODO list view with correlation
     model = InfoObject
-    threshold = 0.4
-
-    #TODO set title
-    title = 'Title Blank'
+    template_name = 'mantis_malte/%s/details/InfoObjectCorrelation.html' % MANTIS_MALTE_TEMPLATE_FAMILY
+    threshold = 0.5
 
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
+        pk = [self.get_object().pk]
+        #TODO get_machting_facts annotated graph
+        matching_facts = self.get_matching_facts(pk)
+        context['cfacts'] = self.get_correlating_iobj(matching_facts,pk)
         return context
 
     def get_matching_facts(self,pk):
@@ -131,27 +137,26 @@ class InfoObjectCorrelationView(DetailView, LoginRequiredMixin):
         return get_facts_rec(pk)
 
     def get_correlating_iobj(self, facts, source_pk):
-        columns = ['iobject','fact']
-        iobj_qs = InfoObject2Fact.objects.filter(fact__in=facts).values(*columns)
+        if facts:
+            sr_list = ['fact__fact_term','iobject__name']
+            pfr_list = ['fact__fact_values']
+            iobj_qs = InfoObject2Fact.objects.filter(fact__in=facts).select_related(*sr_list).prefetch_related(*pfr_list)
 
-        print iobj_qs.query
-        return iobj_qs
-
-
-
-    def get(self, request, *args, **kwargs):
-        pk = [int(self.kwargs['pk'])]
-        facts = self.get_matching_facts(pk)
-        print(facts)
-        print(self.get_correlating_iobj(facts,pk))
+            print iobj_qs.query
+            return iobj_qs
+        else:
+            return []
 
 
 
-        #TODO template context
-        #TODO create template (InfoObjects which could correlate; Package containing them; correlating facts)
-
-
-#TODO Bernd: Multiple Values in DB; Algo resursive search and then join?
+    # def get(self, request, *args, **kwargs):
+    #     obj = self.get_object()
+    #     obj_pk_list = [obj.pk]
+    #     print(obj)
+    #     facts = self.get_matching_facts(obj_pk_list)
+    #     print(facts)
+    #     print(self.get_correlating_iobj(facts,obj_pk_list))
+    #     return super(InfoObjectCorrelationView, self).get(request, *args, **kwargs)
 
 
 
