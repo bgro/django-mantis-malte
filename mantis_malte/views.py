@@ -6,15 +6,16 @@ from django.forms.formsets import formset_factory
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
-from dingos.models import FactTerm, InfoObject, InfoObject2Fact, Fact, vIO2FValue
+from dingos.models import FactTerm, InfoObject, InfoObject2Fact, vIO2FValue
+from dingos.graph_traversal import follow_references
+
+import networkx as nx
 
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
 
 
-from datetime import datetime
-from dingos.graph_traversal import follow_references
 
 class FactTermWeightEdit(LoginRequiredMixin, ListView):
     model = FactTerm
@@ -113,8 +114,7 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
                                  #'keep_graph_info': False,
                                  'iobject_pks': pk}
         G = follow_references(**graph_traversal_kargs)
-        pfr_list = []
-
+        pfr_list = [],
         io2fvs= vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False).prefetch_related(*pfr_list).filter(factterm__factterm_set__weight__gte=self.threshold)
         facts_matching = [x.fact_id for x in io2fvs]
         return facts_matching
@@ -130,17 +130,14 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
         else:
             return []
 
+    @staticmethod
+    def build_correlation_graph(graph):
+        graph2 = nx.MultiDiGraph()
+        graph2.add_node(48)
+        graph2.add_node(49)
+        graph2.add_edge(48,49)
 
-
-    # def get(self, request, *args, **kwargs):
-    #     obj = self.get_object()
-    #     obj_pk_list = [obj.pk]
-    #     print(obj)
-    #     facts = self.get_matching_facts(obj_pk_list)
-    #     print(facts)
-    #     print(self.get_correlating_iobj(facts,obj_pk_list))
-    #     return super(InfoObjectCorrelationView, self).get(request, *args, **kwargs)
-
-
+        graph2.graph['max_nodes_reached'] = False
+        return graph2
 
 
