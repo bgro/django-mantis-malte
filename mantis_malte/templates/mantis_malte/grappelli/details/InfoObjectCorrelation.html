@@ -17,13 +17,13 @@
     <div class="grp-module grp-collapse grp-open">
         <h2 class="grp-collapse-handler">Possible Correlating Facts</h2>
         <table class="grp-full-width">
-        {% for cfact in cfacts %}
+                {% for corr_info in corr_dict.values %}
                 <tr class="grp-row">
                     <th>
                         <label>Fact Value</label>
                     </th>
                     <td>
-                        {% for value in cfact.fact.fact_values.all %}
+                        {% for value in corr_info.values %}
                             {{ value }}
                         {% endfor %}
                     </td>
@@ -31,7 +31,15 @@
                         <label>Embedded in</label>
                     </th>
                     <td rowspan="2" class="border-bottom">
-                        <a href="{%url 'url.dingos.view.infoobject' pk=cfact.iobject.pk %}">{{ cfact.iobject.name }}</a>
+                        {% for iobj in corr_info.iobjects_embb %}
+                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.pk %}">{{ iobj.name }}</a>
+                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.root_pk %}">{{ iobj.root }}</a>
+                        <br />
+                        {% if forloop.last %}
+                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.pk %}">{{ iobj.name }}</a>
+                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.root_pk %}">{{ iobj.root }}</a>
+                        {% endif %}
+                        {% endfor %}
                     </td>
                 </tr>
                 <tr>
@@ -39,11 +47,10 @@
                         <label>Fact Term</label>
                     </th>
                     <td class="border-bottom">
-                       {{ cfact.fact.fact_term }}
+                       {{ corr_info.term }}
                     </td>
                 </tr>
-
-        {% endfor %}
+                {% endfor %}
         </table>
     </div>
 </div>

@@ -6,14 +6,12 @@ from django.forms.formsets import formset_factory
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
-from dingos.models import FactTerm, InfoObject, InfoObject2Fact, vIO2FValue
-from dingos.graph_traversal import follow_references
-
-import networkx as nx
+from dingos.models import FactTerm, InfoObject
 
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
+from .correlation_search import get_matching_facts, get_correlating_iobj
 
 
 
@@ -101,43 +99,8 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pk = [self.get_object().pk]
-        matching_facts = self.get_matching_facts(pk)
-        context['cfacts'] = self.get_correlating_iobj(matching_facts,pk)
+        matching_facts = get_matching_facts(pk,self.threshold)
+        context['corr_dict'] = get_correlating_iobj(matching_facts,pk)
         return context
-
-    def get_matching_facts(self,pk):
-        '''
-        retrieving all associated facts which weight is bigger than defined threshold in self.threshold
-        '''
-        graph_traversal_kargs = {'max_nodes':0,
-                                 'direction':'down',
-                                 #'keep_graph_info': False,
-                                 'iobject_pks': pk}
-        G = follow_references(**graph_traversal_kargs)
-        pfr_list = [],
-        io2fvs= vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False).prefetch_related(*pfr_list).filter(factterm__factterm_set__weight__gte=self.threshold)
-        facts_matching = [x.fact_id for x in io2fvs]
-        return facts_matching
-
-    def get_correlating_iobj(self, facts, source_pk):
-        if facts:
-            sr_list = ['fact__fact_term','iobject__name']
-            pfr_list = ['fact__fact_values']
-            iobj_qs = InfoObject2Fact.objects.filter(fact__in=facts).select_related(*sr_list).prefetch_related(*pfr_list)
-
-            print iobj_qs.query
-            return iobj_qs
-        else:
-            return []
-
-    @staticmethod
-    def build_correlation_graph(graph):
-        graph2 = nx.MultiDiGraph()
-        graph2.add_node(48)
-        graph2.add_node(49)
-        graph2.add_edge(48,49)
-
-        graph2.graph['max_nodes_reached'] = False
-        return graph2
 
 
