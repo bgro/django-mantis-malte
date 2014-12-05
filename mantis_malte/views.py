@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
 from dingos.models import FactTerm, InfoObject
-
+from dingos.core.utilities import set_dict
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
@@ -99,19 +99,17 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pks = [self.get_object().pk]
-        matching_facts = get_matching_facts(pks=pks,threshold=self.threshold)
+        io2fvs_of_interest = get_matching_facts(pks=pks,threshold=self.threshold)
 
-        matching_io2fvs = get_correlating_iobj(matching_facts,pks)
+        matching_io2fvs = get_correlating_iobj(io2fvs_of_interest,pks)
 
-        context['object_list'] = [x.iobject_id for x in matching_io2fvs]
+        context['matching_io2fvs'] = matching_io2fvs
 
-        corr_dict = dict([(x.fact_id,{'term': "%s@%s" %(x.term,x.attribute),
-                                           'value': x.value,
-                                           'iobject_name': x.iobject_name,
-                                           'iobject_id': x.iobject_id}) for x in matching_io2fvs])
+        # We need to set the object_list in order for the
+        # template tag 'reachable_packages' to work
 
-        print corr_dict
-        context['corr_dict'] = corr_dict
+        context['object_list'] = [x.iobject_id for x in context['matching_io2fvs']]
+
         return context
 
 

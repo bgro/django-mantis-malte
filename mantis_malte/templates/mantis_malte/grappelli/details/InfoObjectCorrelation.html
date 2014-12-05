@@ -15,37 +15,33 @@
 <div id="correlation-view">
     {% show_InfoObjectIDData object %}
     <div class="grp-module grp-collapse grp-open">
-        <h2 class="grp-collapse-handler">Possible Correlating Facts</h2>
+        <h2 class="grp-collapse-handler">Correlations (Grouped by correlated fact)</h2>
         <table class="grp-full-width">
-                {% for corr_info in corr_dict.values %}
                 <tr class="grp-row">
-                    <th>
-                        <label>Fact Value</label>
-                    </th>
-                    <td>
-                            {{ corr_info.value }}
-
-                    </td>
-                    <th rowspan="2" class="border-bottom">
-                        <label>Occurs in</label>
-                    </th>
-                    <td rowspan="2" class="border-bottom">
-                        <a href="{%url 'url.dingos.view.infoobject' pk=corr_info.iobject_id %}">{{ corr_info.iobject_name }}</a>
-                        {% reachable_packages corr_info.iobject_id %}
-                        <br />
-                        {% if forloop.last %}
-                            <a href="{%url 'url.dingos.view.infoobject' pk=corr_info.iobject_id %}">{{ corr_info.iobject_name }}</a>
-                    {%reachable_packages corr_info.iobject_id %}
-                        {% endif %}
-
-                    </td>
+                    <td>Fact</td>
+                    <td>Occurs in </td>
+                    <td>Referenced from</td>
                 </tr>
-                <tr>
-                    <th class="border-bottom">
-                        <label>Fact Term</label>
-                    </th>
-                    <td class="border-bottom">
-                       {{ corr_info.term }}
+                {% for matching_io2fv in matching_io2fvs %}
+
+                <tr class="grp-row">
+                    <td>
+                        {% if matching_io2fv.attribute %}
+                           {{ matching_io2fv.term }}@{{ matching_io2fv.attribute }}
+                        {% else %}
+                           {{ matching_io2fv.term }} = {{ matching_io2fv.value }}
+                        {% endif %}
+                    </td>
+                    <td>
+
+                        <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
+                            {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
+                        <br/>
+                        {{ matching_io2fv.iobject_name }}
+
+                    </td>
+                    <td>
+                    {% reachable_packages matching_io2fv.iobject_id %}
                     </td>
                 </tr>
                 {% endfor %}

@@ -30,7 +30,7 @@ def get_matching_facts(pks=None,graph=None,threshold=0.5):
 
     return result_dict
 
-def get_correlating_iobj(entry2iobj, source_pks, correlator='fact'):
+def get_correlating_iobj(entry2iobj, source_pks):
     correlated_io2fvs = vIO2FValue.objects.filter(fact__in=entry2iobj.keys()).exclude(iobject__in=source_pks)
 
     return correlated_io2fvs
