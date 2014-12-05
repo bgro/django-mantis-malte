@@ -11,7 +11,7 @@ from dingos.core.utilities import set_dict
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
-from .correlation_search import get_matching_facts, get_correlating_iobj
+from .correlation_search import get_matching_io2fvs
 
 
 
@@ -99,9 +99,7 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pks = [self.get_object().pk]
-        io2fvs_of_interest = get_matching_facts(pks=pks,threshold=self.threshold)
-
-        matching_io2fvs = get_correlating_iobj(io2fvs_of_interest,pks)
+        matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold)
 
         context['matching_io2fvs'] = matching_io2fvs
 
