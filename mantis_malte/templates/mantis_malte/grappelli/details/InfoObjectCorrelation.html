@@ -23,23 +23,21 @@
                         <label>Fact Value</label>
                     </th>
                     <td>
-                        {% for value in corr_info.values %}
-                            {{ value }}
-                        {% endfor %}
+                            {{ corr_info.value }}
+
                     </td>
                     <th rowspan="2" class="border-bottom">
-                        <label>Embedded in</label>
+                        <label>Occurs in</label>
                     </th>
                     <td rowspan="2" class="border-bottom">
-                        {% for iobj in corr_info.iobjects_embb %}
-                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.pk %}">{{ iobj.name }}</a>
-                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.root_pk %}">{{ iobj.root }}</a>
+                        <a href="{%url 'url.dingos.view.infoobject' pk=corr_info.iobject_id %}">{{ corr_info.iobject_name }}</a>
+                        {% reachable_packages corr_info.iobject_id %}
                         <br />
                         {% if forloop.last %}
-                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.pk %}">{{ iobj.name }}</a>
-                        <a href="{%url 'url.dingos.view.infoobject' pk=iobj.root_pk %}">{{ iobj.root }}</a>
+                            <a href="{%url 'url.dingos.view.infoobject' pk=corr_info.iobject_id %}">{{ corr_info.iobject_name }}</a>
+                    {%reachable_packages corr_info.iobject_id %}
                         {% endif %}
-                        {% endfor %}
+
                     </td>
                 </tr>
                 <tr>
@@ -54,4 +52,4 @@
         </table>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

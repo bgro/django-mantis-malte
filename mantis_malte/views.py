@@ -98,9 +98,20 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
-        pk = [self.get_object().pk]
-        matching_facts = get_matching_facts(pk,self.threshold)
-        context['corr_dict'] = get_correlating_iobj(matching_facts,pk)
+        pks = [self.get_object().pk]
+        matching_facts = get_matching_facts(pks=pks,threshold=self.threshold)
+
+        matching_io2fvs = get_correlating_iobj(matching_facts,pks)
+
+        context['object_list'] = [x.iobject_id for x in matching_io2fvs]
+
+        corr_dict = dict([(x.fact_id,{'term': "%s@%s" %(x.term,x.attribute),
+                                           'value': x.value,
+                                           'iobject_name': x.iobject_name,
+                                           'iobject_id': x.iobject_id}) for x in matching_io2fvs])
+
+        print corr_dict
+        context['corr_dict'] = corr_dict
         return context
 
 
