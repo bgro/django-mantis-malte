@@ -8,7 +8,9 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5):
     '''
     Given a set of object pks or a complete graph of objects,
     return a dictionary
-    retrieving all associated facts which weight is bigger than defined threshold in self.threshold
+    retrieving all associated facts with fact-terms associated in
+    the model FactTermWeight with a weight that is bigger than defined threshold in
+    self.threshold
     '''
 
     if pks:
@@ -28,5 +30,7 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5):
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False).filter(factterm__factterm_set__weight__gte=threshold)
 
-    return vIO2FValue.objects.filter(fact__in=[x.fact_id for x  in io2fvs_of_interest]).exclude(iobject__in=pks)
+    matched_io2fvs = vIO2FValue.objects.filter(fact__in=[x.fact_id for x  in io2fvs_of_interest]).exclude(iobject__in=pks)
+
+    return (io2fvs_of_interest,matched_io2fvs)
 

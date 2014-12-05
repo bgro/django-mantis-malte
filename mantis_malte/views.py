@@ -99,7 +99,7 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pks = [self.get_object().pk]
-        matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold)
+        io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold)
 
         context['matching_io2fvs'] = matching_io2fvs
 
