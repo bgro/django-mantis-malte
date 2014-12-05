@@ -18,20 +18,28 @@ def process(graph):
     #TODO config threshold
     threshold = 0.5
 
-    matching_facts = get_matching_facts([root],threshold)
+    matching_facts = get_matching_facts(graph=graph,threshold=threshold)
     corr_dict = get_correlating_iobj(matching_facts,[root])
+
+    concise_graph = nx.MultiDiGraph()
+
+    concise_graph.add_node(root,attr_dict = graph.node[root])
+
+
     for corr_info in corr_dict.values():
         shortest_path = nx.shortest_path(graph,source=root,target=corr_info['iobj_mapping'])
         graph_part = graph.subgraph(shortest_path)
         corr_graph = nx.compose(corr_graph,graph_part)
+
+        concise_graph.add_node(corr_info['iobj_mapping'], graph.node[corr_info['iobj_mapping']])
+
+
 
         for iobj in corr_info['iobjects_embb']:
             correlation_link = {
                 'correlation' : True
             }
             corr_graph.add_edge(corr_info['iobj_mapping'],iobj['pk'],**correlation_link)
-            print corr_graph.edges(data=True)
-
 
             kwargs = {
                 'iobject_pks' : [iobj['pk']],
