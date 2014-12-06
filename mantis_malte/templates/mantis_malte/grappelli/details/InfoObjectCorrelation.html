@@ -19,7 +19,8 @@
         <table class="grp-full-width">
                 <tr class="grp-row">
                     <td>Fact</td>
-                    <td>Occurs in </td>
+                    <td>Found in </td>
+                    <td>Matched in </td>
                     <td>Referenced from</td>
                 </tr>
                 {% for matching_io2fv in matching_io2fvs %}
@@ -31,6 +32,17 @@
                         {% else %}
                            {{ matching_io2fv.term }} = {{ matching_io2fv.value }}
                         {% endif %}
+                    </td>
+                    <td>
+                    {% for obj_oi in matching_io2fv.objects_oi %}
+                        <a href="{%url 'url.dingos.view.infoobject' pk=obj_oi.iobject_id %}">
+                            {% show_namespace_image obj_oi.iobject_identifier_uri height='25' %}:{{ obj_oi.iobject_identifier_uid }}</a>
+                        <br/>
+                        {{ obj_oi.iobject_name }}
+
+
+                    {% endfor %}
+
                     </td>
                     <td>
 
