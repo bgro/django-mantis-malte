@@ -7,11 +7,11 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
 from dingos.models import FactTerm, InfoObject
-
+from dingos.core.utilities import set_dict
 from . import MANTIS_MALTE_TEMPLATE_FAMILY
 from .forms import FactTermCorrelationEditForm
 from .models import FactTermWeight
-from .correlation_search import get_matching_facts, get_correlating_iobj
+from .correlation_search import get_matching_io2fvs
 
 
 
@@ -98,9 +98,44 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
-        pk = [self.get_object().pk]
-        matching_facts = get_matching_facts(pk,self.threshold)
-        context['corr_dict'] = get_correlating_iobj(matching_facts,pk)
+        pks = [self.get_object().pk]
+        io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold)
+
+        self.matching_io2fvs = matching_io2fvs
+
+
+        context['matching_io2fvs'] = self.matching_io2fvs
+
+        fact2io2vf_oi ={}
+
+
+        for io2fv in io2fvs_of_interest:
+            # The set_dict function is a concise notation for
+            # inserting stuff into a hierarchical dictionary.
+            # The call below takes the fact2io2fvs_oi dictionary
+            # and appends each io2fv to a list of io2fvs
+            # associated with the pk of the contained fact_id (if the key fact_id
+            # does not exist already, a singleton list is created
+            # automatically.
+
+            # In the view, we can use this dictionary to
+            # get information about the objects_of_interest
+
+            set_dict(fact2io2vf_oi,io2fv,'append',io2fv.fact_id)
+
+
+
+
+
+        for matching_io2fv in matching_io2fvs:
+            matching_io2fv.objects_oi = fact2io2vf_oi[matching_io2fv.fact_id]
+
+
+        # We need to set the object_list in order for the
+        # template tag 'reachable_packages' to work
+
+        context['object_list'] = [x.iobject_id for x in context['matching_io2fvs']]
+
         return context
 
 
