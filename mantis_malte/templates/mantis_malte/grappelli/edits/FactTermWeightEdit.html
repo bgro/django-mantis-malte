@@ -1,5 +1,7 @@
 {% extends "mantis_malte/grappelli/base.html" %}
 
+{% load dingos_tags %}
+
 {% block title %}
     {{ view.title }}
 {% endblock %}
@@ -16,22 +18,36 @@
             <div class="grp-module grp-thead">
                 <div class="grp-tr">
                     <div class="grp-th">Fact Term</div>
-                    <div class="grp-th">Weight</div>
+                    <div class="grp-th">Current Weights</div>
+                    <div class="grp-th">New Weight</div>
                 </div>
             </div>
-            {{ formset.management_form }}
-            {% for form in formset %}
+            {% for id,factterm in factterms.items %}
                 <div class="grp-module grp-tbody grp-dynamic-form">
                     <div class="grp-tr">
                         <div class="grp-td">
-                            {{form.fact_term}}
+                            {{ factterm.term }}
                         </div>
                         <div class="grp-td nowrap w-1">
-                            {{form.weight}}
+                            {% for weight in factterm.weights %}
+                                {% if not forloop.last %}
+                                    {{ weight }}<br />
+                                {% else %}
+                                    {{ weight }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="grp-td nowrap w-1">
+                            {{ form }}
                         </div>
                     </div>
                 </div>
             {% endfor %}
+        </div>
+        <div class="grp-module">
+            {% if view.is_paginated %}
+                {%  render_paginator  %}
+            {% endif %}
         </div>
     </div>
     <footer>
