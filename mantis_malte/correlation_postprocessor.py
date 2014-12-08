@@ -6,11 +6,13 @@ from dingos.graph_traversal import follow_references
 from dingos.graph_utils import dfs_preorder_nodes
 from dingos.core.utilities import set_dict
 
+from mantis_stix_importer.graph_postprocessors import standard_postprocessor as stix_standard_postprocessor
+
 import networkx as nx
 
 from .correlation_search import get_matching_io2fvs
 
-def process(graph):
+def process(graph,**kwargs):
     """
     Given a graph, calculate a graph showing correlation information.
 
@@ -35,7 +37,11 @@ def process(graph):
       A graph that only contains the root object and top-level objeccts
       (STIX packages or whatever) referencing the matched objects.
     """
-    
+
+    print kwargs
+
+    unfolding = kwargs.get('unfolding','auto')
+
     root = graph.graph['root']
     
     threshold = 0.5
@@ -131,10 +137,19 @@ def process(graph):
                     very_concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
                     very_concise_graph.add_edge(root,id,correlation=True)
 
-    if len(corr_graph.nodes()) < 200:
-        return corr_graph
-    elif len(concise_graph.nodes()) < 200:
-        return concise_graph
-    else:
+    corr_graph = stix_standard_postprocessor.process(corr_graph)
+
+    if unfolding == 'minimal':
         return very_concise_graph
+    elif unfolding == 'concise':
+        return concise_graph
+    elif unfolding == 'full':
+        return corr_graph
+    else:
+        if len(corr_graph.nodes()) < 200:
+            return corr_graph
+        elif len(concise_graph.nodes()) < 200:
+            return concise_graph
+        else:
+            return very_concise_graph
 
