@@ -7,7 +7,7 @@ from dingos.models import FactTerm
 
 
 class FactTermWeight(models.Model):
-    fact_term = models.ForeignKey(FactTerm,related_name='factterm_set')
+    fact_term = models.ForeignKey(FactTerm,related_name='factterm_set2')
     weight = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 
     class Meta:
@@ -20,7 +20,7 @@ class AssignmentName(models.Model):
         return ("%s" % self.name)
 
 class FactTerm2Weight(models.Model):
-    fact_term = models.ForeignKey(FactTerm,related_name='factterm_set2')
+    fact_term = models.ForeignKey(FactTerm,related_name='factterm_set')
     assignment_name = models.ForeignKey(AssignmentName, related_name='aname')
     weight = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 

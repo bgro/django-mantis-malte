@@ -22,7 +22,8 @@
                     <div class="grp-th">New Weight</div>
                 </div>
             </div>
-            {% for id,factterm in factterms.items %}
+            {{ formset.management_form }}
+            {% for factterm,form in factterms.values|zip:formset %}
                 <div class="grp-module grp-tbody grp-dynamic-form">
                     <div class="grp-tr">
                         <div class="grp-td">
@@ -38,7 +39,7 @@
                             {% endfor %}
                         </div>
                         <div class="grp-td nowrap w-1">
-                            {{ form }}
+                                {{ form }}
                         </div>
                     </div>
                 </div>
