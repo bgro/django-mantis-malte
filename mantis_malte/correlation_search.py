@@ -36,7 +36,7 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5):
         G = follow_references(**graph_traversal_kargs)
     else:
         G = graph
-        pks = graph.nodes()
+    pks = G.nodes()
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False)\
         .filter(factterm__factterm_set__weight__gte=threshold)
@@ -44,6 +44,8 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5):
     # TODO: probably, below we should add another filter that exclucdes
     # outdated objects (i.e., check that iobject_id = latest_iobject_id) --
     # otherwise we will get matches with older revisions of objects.
+
+
 
     matched_io2fvs = vIO2FValue.objects\
         .filter(fact__in=[x.fact_id for x  in io2fvs_of_interest])\
