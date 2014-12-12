@@ -109,7 +109,6 @@ def process(graph,**kwargs):
     very_concise_graph = nx.MultiDiGraph()
     very_concise_graph.add_node(root,attr_dict = graph.node[root])
 
-    concise_graph.add_node(root,attr_dict = graph.node[root])
     for source_obj in obj_of_interest:
         concise_graph.add_node(source_obj,attr_dict = graph.node[source_obj])
         concise_graph.add_edge(root,source_obj)

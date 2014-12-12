@@ -1,4 +1,4 @@
-{% extends "mantis_malte/grappelli/base.html" %}
+{% extends "dingos/grappelli/lists/base_lists_two_column.html" %}
 
 {% load dingos_tags %}
 
@@ -11,7 +11,7 @@
 {% endblock %}
 
 
-{% block content %}
+{% block left_column %}
 <div id="correlation-view">
     {% show_InfoObjectIDData object %}
     <div class="grp-module grp-collapse grp-open">
@@ -60,4 +60,33 @@
         </table>
     </div>
 </div>
-{% endblock content %}
+{% endblock left_column %}
+
+{% block right_column %}
+    <div class="grp-module">
+        <h2>{% block tool_title %}Filter{% endblock %}</h2>
+        {% block list-tools %}
+            {% if form %}
+                <div class="grp-row">
+                    <form action="" method="POST">
+                    {% csrf_token %}
+                        <table>
+                            <tbody>
+                            {% for field in form %}
+                                    <tr>
+                                        <th>{{ field.label_tag }}</th>
+                                        <td>{{ field.errors }} {{ field }}</td>
+                                    </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div style="padding-top:10px;text-align:right;">
+                          <input name="action" value="Submit Query" type="submit" />
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+    </div>
+{% endblock %}

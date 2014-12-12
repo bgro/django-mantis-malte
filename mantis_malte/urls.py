@@ -6,7 +6,6 @@ from mantis_malte import views
 
 urlpatterns = patterns('',
 
-    #TODO Correlation View for single Infobject
     url(r'^View/Correlation/(?P<pk>\d*)$',
         views.InfoObjectCorrelationView.as_view(),
         name="url.mantis_malte.view.corr.infoobject"),
