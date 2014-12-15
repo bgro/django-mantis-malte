@@ -48,7 +48,7 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
         initial = []
         self.page = request.GET.get('page')
 
-        columns = ['id','term','attribute','factterm_set__assignment_name__name','factterm_set__weight']
+        columns = ['id','term','attribute','weight_set__assignment_name__name','weight_set__weight']
 
         factterm_list = self.get_queryset().values(*columns).order_by('term')
         self.factterms_paginator = Paginator(factterm_list, ELEMENTS_PER_PAGE)
@@ -71,11 +71,11 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
         for fact_term in self.factterms:
             curr_factterm = self.fact_terms.get(fact_term['id'],False)
             if curr_factterm:
-                curr_factterm['weights'].append("%s: %s" % (fact_term['factterm_set__assignment_name__name'],fact_term['factterm_set__weight']))
+                curr_factterm['weights'].append("%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight']))
             else:
                 self.fact_terms[fact_term['id']] = {
                 'term' : "%s@%s" % (fact_term['term'], fact_term['attribute']) if fact_term['attribute'] else "%s" % (fact_term['term']),
-                'weights' : ["%s: %s" % (fact_term['factterm_set__assignment_name__name'],fact_term['factterm_set__weight'])]
+                'weights' : ["%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight'])]
                 }
         for factterm_id in self.fact_terms.keys():
             initial.append({
