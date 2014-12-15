@@ -11,7 +11,7 @@ from django.views.generic.detail import DetailView
 
 from dingos.models import FactTerm, InfoObject
 from dingos.core.utilities import set_dict
-from dingos.view_classes import ViewMethodMixin
+from dingos.view_classes import ViewMethodMixin, CommonContextMixin
 from . import MANTIS_MALTE_TEMPLATE_FAMILY, ELEMENTS_PER_PAGE, DEFAULT_ASSIGNMENT
 from .forms import FactTermCorrelationEditForm, CorrelationViewForm
 from .models import FactTerm2Weight, AssignmentName
@@ -122,8 +122,7 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
             #TODO catch invalid form, e.g. weight out of range
         return self.get(request, *args, **kwargs)
 
-#, FilterView
-class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
+class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequiredMixin, DetailView):
     #TODO list view with correlation
     model = InfoObject
     template_name = 'mantis_malte/%s/details/InfoObjectCorrelation.html' % MANTIS_MALTE_TEMPLATE_FAMILY
