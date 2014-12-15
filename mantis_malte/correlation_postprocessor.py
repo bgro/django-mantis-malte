@@ -10,6 +10,7 @@ from mantis_stix_importer.graph_postprocessors import standard_postprocessor as 
 
 import networkx as nx
 
+from . import DEFAULT_ASSIGNMENT
 from .correlation_search import get_matching_io2fvs
 
 def process(graph,**kwargs):
@@ -64,7 +65,7 @@ def process(graph,**kwargs):
     #   contained in at least one of the io2fvs_of_interest. 
     #   These are the matching io2fv.
 
-    io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(graph=graph,threshold=threshold,assignment='default')
+    io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(graph=graph,threshold=threshold,assignment=DEFAULT_ASSIGNMENT)
 
 
     # We will compile a dictionary matching facts to the iobjects of interest

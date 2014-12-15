@@ -176,6 +176,43 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
 
         context['form'] = CorrelationViewForm(initial={'assignment_name' : self.assignment})
 
+        # def reachable_packages(context, current_node):
+        #     view = context["view"]
+        #
+        #     try:
+        #         graph = view.graph
+        #     except:
+        #         view.graph = None
+        #
+        #     # The graph is generated just once per search request
+        #     if not view.graph:
+        #
+        #         object_list = context['object_list']
+        #
+        #
+        #         if object_list:
+        #
+        #             if isinstance(object_list[0],InfoObject):
+        #                 pks = [one.pk for one in object_list]
+        #             elif isinstance(object_list[0],InfoObject2Fact):
+        #                 pks = [one.iobject.pk for one in object_list]
+        #             elif isinstance(object_list[0],int):
+        #                 pks = object_list
+        #             else:
+        #                 pks = []
+        #         view.graph = follow_references(pks, direction= 'up')
+        #
+        #     node_ids = list(dfs_preorder_nodes(view.graph, source=current_node))
+        #
+        #     resulting_nodes = []
+        #     if view.graph.node:
+        #         for id in node_ids:
+        #             node = view.graph.node[id]
+        #             if "STIX_Package" in node['iobject_type']:
+        #             #if "Indicator" in node['iobject_type']:
+        #                 resulting_nodes.append((id,node))
+        #     context['node_list'] =  resulting_nodes
+
         return context
 
     def post(self, request, *args, **kwargs):

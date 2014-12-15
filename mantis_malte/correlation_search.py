@@ -4,7 +4,9 @@ from dingos.models import InfoObject2Fact, vIO2FValue
 from dingos.graph_traversal import follow_references
 from dingos.core.utilities import set_dict
 
-def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment='default'):
+from . import DEFAULT_ASSIGNMENT
+
+def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASSIGNMENT):
     '''
     Given a set of iobject primary keys (which are then
     expanded into a downwward-reachability graph) or a

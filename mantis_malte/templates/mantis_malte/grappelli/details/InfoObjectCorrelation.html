@@ -53,7 +53,8 @@
 
                     </td>
                     <td>
-                    {% reachable_packages matching_io2fv.iobject_id %}
+                    {#  reachable_packages matching_io2fv.iobject_id #}
+                    {% include "dingos/grappelli/_List_of_InfoObject_IDs.html" %}
                     </td>
                 </tr>
                 {% endfor %}
