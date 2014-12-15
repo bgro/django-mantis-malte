@@ -23,7 +23,7 @@ from models import AssignmentName, FactTerm2Weight
 
 admin.site.register(AssignmentName)
 
-admin.site.register(AssignmentName,FactTerm2Weight)
+admin.site.register(FactTerm2Weight)
 
 
 
