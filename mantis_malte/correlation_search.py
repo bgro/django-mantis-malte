@@ -4,7 +4,7 @@ from dingos.models import InfoObject2Fact, vIO2FValue
 from dingos.graph_traversal import follow_references
 from dingos.core.utilities import set_dict
 
-def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=None):
+def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment='default'):
     '''
     Given a set of iobject primary keys (which are then
     expanded into a downwward-reachability graph) or a
@@ -28,6 +28,8 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=None):
 
     '''
 
+    print assignment
+
     if pks:
         graph_traversal_kargs = {'max_nodes':0,
                                  'direction':'down',
@@ -39,7 +41,7 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=None):
     pks = G.nodes()
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False)\
-        .filter(factterm__factterm_set__weight__gte=threshold,factterm__factterm_set__assignment_name=assignment)
+        .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
 
     # TODO: probably, below we should add another filter that exclucdes
     # outdated objects (i.e., check that iobject_id = latest_iobject_id) --

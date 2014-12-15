@@ -64,7 +64,7 @@ def process(graph,**kwargs):
     #   contained in at least one of the io2fvs_of_interest. 
     #   These are the matching io2fv.
 
-    io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(graph=graph,threshold=threshold)
+    io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(graph=graph,threshold=threshold,assignment='default')
 
 
     # We will compile a dictionary matching facts to the iobjects of interest
@@ -104,14 +104,12 @@ def process(graph,**kwargs):
 
     reachability_graph =  corr_graph.reverse()
 
-    concise_graph = nx.MultiDiGraph()
+    concise_graph = nx.DiGraph()
     concise_graph.add_node(root,attr_dict = graph.node[root])
-    very_concise_graph = nx.MultiDiGraph()
+    very_concise_graph = nx.DiGraph()
     very_concise_graph.add_node(root,attr_dict = graph.node[root])
 
     for source_obj in obj_of_interest:
-        concise_graph.add_node(source_obj,attr_dict = graph.node[source_obj])
-        concise_graph.add_edge(root,source_obj)
 
         shortest_path = nx.shortest_path(graph,source=root,target=source_obj)
         graph_part = graph.subgraph(shortest_path)
@@ -122,6 +120,10 @@ def process(graph,**kwargs):
 
         for source_obj in fact2obj[io2fv.fact_id]:
             corr_graph.add_edge(source_obj,io2fv.iobject_id,correlation=True)
+
+            concise_graph.add_node(source_obj,attr_dict = graph.node[source_obj])
+            concise_graph.add_edge(root,source_obj)
+
             concise_graph.add_edge(source_obj,io2fv.iobject_id,correlation=True)
 
 
@@ -129,7 +131,7 @@ def process(graph,**kwargs):
             for id in node_ids:
                 node = corr_graph.node[id]
                 #if "STIX_Package" in node['iobject_type']:
-                if "Indicator" in node['iobject_type']:
+                if node['iobject_type'] in ["Indicator", "STIX_Package"]:
                     concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
                     concise_graph.add_edge(id,io2fv.iobject_id)
 

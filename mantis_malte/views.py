@@ -14,18 +14,24 @@ from dingos.core.utilities import set_dict
 from dingos.view_classes import ViewMethodMixin
 from . import MANTIS_MALTE_TEMPLATE_FAMILY, ELEMENTS_PER_PAGE, DEFAULT_ASSIGNMENT
 from .forms import FactTermCorrelationEditForm, CorrelationViewForm
-from .models import FactTerm2Weight
+from .models import FactTerm2Weight, AssignmentName
 from .correlation_search import get_matching_io2fvs
 
 
 
 class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
+
+    # make sure that the default assignment exists
+    AssignmentName.objects.get_or_create(name=DEFAULT_ASSIGNMENT)
+
     model = FactTerm
 
     template_name = 'mantis_malte/%s/edits/FactTermWeightEdit.html' % MANTIS_MALTE_TEMPLATE_FAMILY
 
     form_class = formset_factory(FactTermCorrelationEditForm, extra=0)
     formset = None
+
+
 
     #TODO set title
     title = 'Title Test'
@@ -123,13 +129,14 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     template_name = 'mantis_malte/%s/details/InfoObjectCorrelation.html' % MANTIS_MALTE_TEMPLATE_FAMILY
     threshold = 0.5
     #default value
-    assignment = DEFAULT_ASSIGNMENT
+    assignment,dummy = AssignmentName.objects.get_or_create(name=DEFAULT_ASSIGNMENT)
+
 
     def get_context_data(self, **kwargs):
         context = super(InfoObjectCorrelationView, self).get_context_data(**kwargs)
         pks = [self.get_object().pk]
 
-        io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold,assignment=self.assignment)
+        io2fvs_of_interest, matching_io2fvs = get_matching_io2fvs(pks=pks,threshold=self.threshold,assignment=self.assignment.name)
 
         self.matching_io2fvs = matching_io2fvs
 
@@ -166,6 +173,8 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
 
         context['object_list'] = [x.iobject_id for x in context['matching_io2fvs']]
 
+
+
         context['form'] = CorrelationViewForm(initial={'assignment_name' : self.assignment})
 
         return context
@@ -173,5 +182,5 @@ class InfoObjectCorrelationView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         form = CorrelationViewForm(request.POST)
         if form.is_valid():
-            self.assignment = form.cleaned_data['assignment_name']
+            self.assignment, dummy = AssignmentName.objects.get_or_create(name=form.cleaned_data['assignment_name'])
         return super(InfoObjectCorrelationView, self).get(request, *args, **kwargs)
