@@ -57,6 +57,7 @@
 
                     </td>
                     <td>
+
                         {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
 
                         {% for node in node_list %}
@@ -66,6 +67,7 @@
                             {% if not forloop.last %},<br/>
                             {% endif %}
                         {% endfor %}
+
 
                     </td>
                 </tr>

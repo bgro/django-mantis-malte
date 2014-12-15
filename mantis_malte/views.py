@@ -214,7 +214,6 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
 
         context['form'] = CorrelationViewForm(initial={'assignment_name' : self.assignment})
 
-        # For test
 
         context["fact_id__2__io2vf_oi"] = fact_id__2__io2vf_oi
 
@@ -229,6 +228,7 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
         context["top_level_iobject_id__2__matching_obj_ids"] = top_level_iobject_id__2__matching_obj_ids
 
         context["top_level_iobject_id__2__node_info"] = top_level_iobject_id__2__node_info
+
 
         return context
 
