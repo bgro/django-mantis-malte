@@ -11,6 +11,9 @@ from django.views.generic.detail import DetailView
 
 from dingos.models import FactTerm, InfoObject
 from dingos.core.utilities import set_dict
+
+from dingos.templatetags.dingos_tags import reachable_packages
+
 from dingos.view_classes import ViewMethodMixin, CommonContextMixin
 from . import MANTIS_MALTE_TEMPLATE_FAMILY, ELEMENTS_PER_PAGE, DEFAULT_ASSIGNMENT
 from .forms import FactTermCorrelationEditForm, CorrelationViewForm
@@ -139,32 +142,59 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
 
         self.matching_io2fvs = matching_io2fvs
 
-
         context['matching_io2fvs'] = self.matching_io2fvs
 
-        fact2io2vf_oi ={}
 
+        # The dictionaries below are populated such that
+        # they allow us to retrieve required information
+        # fast in the view.
+
+
+        # Mapping of fact_id to list of io2vf-of-interest-objects containing that fact_id
+        fact_id__2__io2vf_oi ={}
+
+        # Mapping of iobject_id to list of io2vf-of-interest-objects containing that fact_id
+        iobject_id__2__io2vf_oi = {}
+
+        # The same as the two above, but for the macthing io2vf-objects
+        fact_id__2__matching_io2vf ={}
+        iobject_id__2__matching_io2v = {}
+
+        # Mapping of iobject_id of matching Info-Objects to information
+        # about the found top-level object pks,
+
+        matching_iobject_id__2__top_level_object_ids = {}
+
+        # Mapping from top-level iobject pks to the referenced matching iobjects
+
+        top_level_iobject_id__2__matching_obj_ids = {}
+
+        # Mapping of top-level iobject pk to associated node info from graph representation
+
+        top_level_iobject_id__2__node_info = {}
 
         for io2fv in io2fvs_of_interest:
             # The set_dict function is a concise notation for
             # inserting stuff into a hierarchical dictionary.
-            # The call below takes the fact2io2fvs_oi dictionary
+            # The call below takes the fact_id__2__io2vf_oi dictionary
             # and appends each io2fv to a list of io2fvs
             # associated with the pk of the contained fact_id (if the key fact_id
             # does not exist already, a singleton list is created
             # automatically.
 
-            # In the view, we can use this dictionary to
-            # get information about the objects_of_interest
+            set_dict(fact_id__2__io2vf_oi,io2fv,'append',io2fv.fact_id)
 
-            set_dict(fact2io2vf_oi,io2fv,'append',io2fv.fact_id)
+            set_dict(iobject_id__2__io2vf_oi, io2fv, 'append',io2fv.iobject_id)
 
+        for io2fv in matching_io2fvs:
 
+            set_dict(fact_id__2__matching_io2vf,io2fv,'append',io2fv.fact_id)
 
+            set_dict(iobject_id__2__matching_io2v, io2fv, 'append',io2fv.iobject_id)
 
 
         for matching_io2fv in matching_io2fvs:
-            matching_io2fv.objects_oi = fact2io2vf_oi[matching_io2fv.fact_id]
+            matching_io2fv.objects_oi = fact_id__2__io2vf_oi[matching_io2fv.fact_id]
 
 
         # We need to set the object_list in order for the
@@ -174,7 +204,31 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
 
 
 
+        for matched_object_pk in context['object_list']:
+            found_top_level_objects = reachable_packages(context,matched_object_pk)['node_list']
+            for (pk,node_info) in found_top_level_objects:
+                set_dict(matching_iobject_id__2__top_level_object_ids,pk,'add_elt',matched_object_pk)
+                top_level_iobject_id__2__node_info[pk] = node_info
+                set_dict(top_level_iobject_id__2__matching_obj_ids,matched_object_pk,'add_elt',pk)
+
+
         context['form'] = CorrelationViewForm(initial={'assignment_name' : self.assignment})
+
+        # For test
+
+        context["fact_id__2__io2vf_oi"] = fact_id__2__io2vf_oi
+
+        context["iobject_id__2__io2vf_oi"] = iobject_id__2__io2vf_oi
+
+        context["fact_id__2__matching_io2vf"] = fact_id__2__matching_io2vf
+
+        context["iobject_id__2__matching_io2v"] = iobject_id__2__matching_io2v
+
+        context["matching_iobject_id__2__top_level_object_ids"] = matching_iobject_id__2__top_level_object_ids
+
+        context["top_level_iobject_id__2__matching_obj_ids"] = top_level_iobject_id__2__matching_obj_ids
+
+        context["top_level_iobject_id__2__node_info"] = top_level_iobject_id__2__node_info
 
         return context
 

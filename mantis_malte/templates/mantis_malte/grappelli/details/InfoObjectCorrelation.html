@@ -35,6 +35,7 @@
                     </td>
                     <td>
                     {% for obj_oi in matching_io2fv.objects_oi %}
+
                         <a href="{%url 'url.dingos.view.infoobject' pk=obj_oi.iobject_id %}">
                             {% show_namespace_image obj_oi.iobject_identifier_uri height='25' %}:{{ obj_oi.iobject_identifier_uid }}</a>
                         <br/>
@@ -46,6 +47,9 @@
                     </td>
                     <td>
 
+
+
+
                         <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
                             {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
                         <br/>
@@ -53,7 +57,16 @@
 
                     </td>
                     <td>
-                    {% reachable_packages matching_io2fv.iobject_id %}
+                        {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
+
+                        {% for node in node_list %}
+                            {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
+                            <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
+                            {{ node_info.name }}
+                            {% if not forloop.last %},<br/>
+                            {% endif %}
+                        {% endfor %}
+
                     </td>
                 </tr>
                 {% endfor %}
