@@ -21,9 +21,20 @@ from django.contrib import admin
 from models import AssignmentName, FactTerm2Weight
 
 
-admin.site.register(AssignmentName)
 
-admin.site.register(FactTerm2Weight)
+
+class FactTerm2WeightAdmin(admin.ModelAdmin):
+    list_display = ('fact_term','assignment_name','weight')
+
+class AssignmentNameAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+
+
+admin.site.register(AssignmentName,AssignmentNameAdmin)
+
+admin.site.register(FactTerm2Weight,FactTerm2WeightAdmin)
 
 
 
