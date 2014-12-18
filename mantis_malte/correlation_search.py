@@ -11,6 +11,15 @@ exclude_facts = [{'term': "Properties/Address_Value",
                 'value': "174.34.133.248"}
                 ]
 
+if exclude_facts:
+    facts_to_exclude_qs = vIO2FValue.objects.distinct('fact_id').values_list('fact_id', flat=True)
+    for fact in exclude_facts:
+        facts_to_exclude_qs = facts_to_exclude_qs.filter(term=fact['term'],
+                                                        attribute=fact['attribute'],
+                                                        value=fact['value'])
+    FACTS_TO_EXCLUDE = list(facts_to_exclude_qs)
+else:
+    FACTS_TO_EXCLUDE = []
 
 def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASSIGNMENT):
     '''
@@ -50,11 +59,18 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASS
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False)\
         .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
-    #excluding facts configured in exclude_facts
-    for fact in exclude_facts:
-        io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],
-                                                        attribute=fact['attribute'],
-                                                        value=fact['value'])
+
+    #fetch facts to exclude at server startup
+    if True:
+        io2fvs_of_interest = io2fvs_of_interest.exclude(fact_id__in=FACTS_TO_EXCLUDE)
+
+    #exclude facts per query by filtering
+    if False:
+        #excluding facts configured in exclude_facts
+        for fact in exclude_facts:
+            io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],
+                                                            attribute=fact['attribute'],
+                                                            value=fact['value'])
 
     # TODO: probably, below we should add another filter that exclucdes
     # outdated objects (i.e., check that iobject_id = latest_iobject_id) --
