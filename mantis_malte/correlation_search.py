@@ -6,6 +6,7 @@ from dingos.core.utilities import set_dict
 
 from . import DEFAULT_ASSIGNMENT
 
+
 def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASSIGNMENT):
     '''
     Given a set of iobject primary keys (which are then
