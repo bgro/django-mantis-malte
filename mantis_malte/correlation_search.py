@@ -6,6 +6,20 @@ from dingos.core.utilities import set_dict
 
 from . import DEFAULT_ASSIGNMENT
 
+exclude_facts = [{'term': "Properties/Hashes/Hash/Simple_Hash_Value",
+                'attribute': "",
+                'value': "d41d8cd98f00b204e9800998ecf8427e"},
+                 {'term': "Properties/Hashes/Hash/Simple_Hash_Value",
+                  'attribute': "",
+                  'value': "da39a3ee5e6b4b0d3255bfef95601890afd80709"},
+                 {'term': "Properties/Hashes/Hash/Simple_Hash_Value",
+                  'attribute': "",
+                'value': "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+                 {'term': "Properties/File_Name",
+                  'attribute': "",
+                'value': "autoexec.bat"}
+                ]
+
 
 def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASSIGNMENT):
     '''
@@ -45,6 +59,11 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASS
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False)\
         .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
+    #excluding facts configured in exclude_facts
+    for fact in exclude_facts:
+        io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],
+                                                        attribute=fact['attribute'],
+                                                        value=fact['value'])
 
     # TODO: probably, below we should add another filter that exclucdes
     # outdated objects (i.e., check that iobject_id = latest_iobject_id) --
