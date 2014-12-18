@@ -6,6 +6,12 @@ from dingos.core.utilities import set_dict
 
 from . import DEFAULT_ASSIGNMENT
 
+exclude_facts = [{'term': "Properties/Address_Value",
+                'attribute': "",
+                'value': "174.34.133.248"}
+                ]
+
+
 def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASSIGNMENT):
     '''
     Given a set of iobject primary keys (which are then
@@ -44,6 +50,11 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASS
 
     io2fvs_of_interest = vIO2FValue.objects.filter(iobject__id__in=G.nodes(),node_id__isnull=False)\
         .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
+    #excluding facts configured in exclude_facts
+    for fact in exclude_facts:
+        io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],
+                                                        attribute=fact['attribute'],
+                                                        value=fact['value'])
 
     # TODO: probably, below we should add another filter that exclucdes
     # outdated objects (i.e., check that iobject_id = latest_iobject_id) --
