@@ -17,7 +17,7 @@
     <div class="grp-module grp-collapse grp-open">
         <h2 class="grp-collapse-handler">Correlations (Grouped by correlated fact)</h2>
         <table class="grp-full-width">
-                <tr class="grp-row">
+                <tr class="grp-row" style="display: none">
                     <td>Fact</td>
                     <td>Found in </td>
                     <td>Matched in </td>
@@ -25,7 +25,7 @@
                 </tr>
                 {% for matching_io2fv in matching_io2fvs %}
 
-                <tr class="grp-row">
+                <tr class="grp-row" style="display: none">
                     <td>
                         {% if matching_io2fv.attribute %}
                            {{ matching_io2fv.term }}@{{ matching_io2fv.attribute }}
@@ -56,6 +56,65 @@
                         {{ matching_io2fv.iobject_name }}
 
                     </td>
+                    <td>
+
+                        {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
+
+                        {% for node in node_list %}
+                            {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
+                            <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
+                            {{ node_info.name }}
+                            {% if not forloop.last %},<br/>
+                            {% endif %}
+                        {% endfor %}
+
+
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <tr class="grp-row">
+                    <td>Top Level IObject</td>
+                    <td>Matched IObject </td>
+                    <td>Found in</td>
+                    <td>Matched Fact</td>
+                </tr>
+
+                {% for top_node,matching_obj_pk in top_level_iobject_id__2__matching_obj_ids.items %}
+                <tr class="grp-row">
+                    <td>
+                        {% context_dict_lookup 'top_level_iobject_id__2__node_info' top_node as node_info %}
+                        <a href="{%url 'url.dingos.view.infoobject' pk=top_node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
+                        {{ node_info.name }}
+                    </td>
+
+                    <td>
+                    {% for pk in matching_obj_pk %}
+                    {% context_dict_lookup 'iobject_id__2__matching_io2v' pk as matched_objs %}
+                        {% for matched_obj in matched_objs %}
+                            <a href="{%url 'url.dingos.view.infoobject' pk=pk %}">
+                            {% show_namespace_image matched_obj.iobject_identifier_uri height='25' %}:{{ matched_obj.iobject_identifier_uid }}</a>
+                            <br/>
+                            {{ matched_obj.iobject_name }}
+                        {% endfor %}
+                    {% endfor %}
+                    </td>
+
+                    <td>
+                    {% for pk in matching_obj_pk %}
+                    {% context_dict_lookup 'iobject_id__2__matching_io2v' pk as matched_objs %}
+                        {% for matched_obj in matched_objs %}
+                            {% context_dict_lookup 'fact_id__2__io2vf_oi' matched_obj.fact_id as iobjs_oi %}
+                            {% for iobj_oi in iobjs_oi %}
+                                <a href="{%url 'url.dingos.view.infoobject' pk=iobj_oi.iobject_id %}">
+                                {% show_namespace_image iobj_oi.iobject_identifier_uri height='25' %}:{{ iobj_oi.iobject_identifier_uid }}</a>
+                                <br/>
+                                {{ iobj_oi.iobject_name }}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    </td>
+
                     <td>
 
                         {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
