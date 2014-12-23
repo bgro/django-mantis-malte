@@ -14,47 +14,37 @@
 {% block left_column %}
 <div id="correlation-view">
     {% show_InfoObjectIDData object %}
-    <div class="grp-module grp-collapse grp-open">
+    <div class="grp-module grp-collapse grp-closed">
         <h2 class="grp-collapse-handler">Correlations (Grouped by correlated fact)</h2>
-        <table class="grp-full-width">
-                <tr class="grp-row" style="display: none">
-                    <td>Fact</td>
+        {% for matching_io2fv in matching_io2fvs %}
+        <div class="grp-module grp-collapse grp-closed">
+            <h3 class="grp-collapse-handler">
+                {% if matching_io2fv.attribute %}
+                   {{ matching_io2fv.term }}@{{ matching_io2fv.attribute }}
+                {% else %}
+                   {{ matching_io2fv.term }} = {{ matching_io2fv.value }}
+                {% endif %}
+            </h3>
+            <table class="grp-full-width">
+                <tr class="grp-row">
                     <td>Found in </td>
                     <td>Matched in </td>
                     <td>Referenced from</td>
                 </tr>
-                {% for matching_io2fv in matching_io2fvs %}
-
-                <tr class="grp-row" style="display: none">
-                    <td>
-                        {% if matching_io2fv.attribute %}
-                           {{ matching_io2fv.term }}@{{ matching_io2fv.attribute }}
-                        {% else %}
-                           {{ matching_io2fv.term }} = {{ matching_io2fv.value }}
-                        {% endif %}
-                    </td>
+                <tr class="grp-row">
                     <td>
                     {% for obj_oi in matching_io2fv.objects_oi %}
-
                         <a href="{%url 'url.dingos.view.infoobject' pk=obj_oi.iobject_id %}">
                             {% show_namespace_image obj_oi.iobject_identifier_uri height='25' %}:{{ obj_oi.iobject_identifier_uid }}</a>
                         <br/>
                         {{ obj_oi.iobject_name }}
-
-
                     {% endfor %}
-
                     </td>
                     <td>
-
-
-
-
                         <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
                             {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
                         <br/>
                         {{ matching_io2fv.iobject_name }}
-
                     </td>
                     <td>
 
@@ -67,71 +57,53 @@
                             {% if not forloop.last %},<br/>
                             {% endif %}
                         {% endfor %}
-
-
                     </td>
                 </tr>
-                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+    </div>
 
-                <tr class="grp-row">
-                    <td>Top Level IObject</td>
-                    <td>Matched IObject </td>
-                    <td>Found in</td>
-                    <td>Matched Fact</td>
-                </tr>
+    <div class="grp-module grp-collapse grp-closed">
+        <h2 class="grp-collapse-handler">Correlations (Grouped by top-level-element)</h2>
 
-                {% for top_node,matching_obj_pk in top_level_iobject_id__2__matching_obj_ids.items %}
-                <tr class="grp-row">
-                    <td>
-                        {% context_dict_lookup 'top_level_iobject_id__2__node_info' top_node as node_info %}
-                        <a href="{%url 'url.dingos.view.infoobject' pk=top_node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
-                        {{ node_info.name }}
-                    </td>
-
-                    <td>
-                    {% for pk in matching_obj_pk %}
-                    {% context_dict_lookup 'iobject_id__2__matching_io2v' pk as matched_objs %}
-                        {% for matched_obj in matched_objs %}
-                            <a href="{%url 'url.dingos.view.infoobject' pk=pk %}">
-                            {% show_namespace_image matched_obj.iobject_identifier_uri height='25' %}:{{ matched_obj.iobject_identifier_uid }}</a>
-                            <br/>
-                            {{ matched_obj.iobject_name }}
-                        {% endfor %}
-                    {% endfor %}
-                    </td>
-
-                    <td>
-                    {% for pk in matching_obj_pk %}
-                    {% context_dict_lookup 'iobject_id__2__matching_io2v' pk as matched_objs %}
-                        {% for matched_obj in matched_objs %}
-                            {% context_dict_lookup 'fact_id__2__io2vf_oi' matched_obj.fact_id as iobjs_oi %}
-                            {% for iobj_oi in iobjs_oi %}
-                                <a href="{%url 'url.dingos.view.infoobject' pk=iobj_oi.iobject_id %}">
-                                {% show_namespace_image iobj_oi.iobject_identifier_uri height='25' %}:{{ iobj_oi.iobject_identifier_uid }}</a>
-                                <br/>
-                                {{ iobj_oi.iobject_name }}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endfor %}
-                    </td>
-
-                    <td>
-
-                        {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
-
-                        {% for node in node_list %}
-                            {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
-                            <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
-                            {{ node_info.name }}
-                            {% if not forloop.last %},<br/>
+        {% for top_node,top_node_info in top_level_iobject_id__2__node_info.items %}
+            <div class="grp-module grp-collapse grp-closed">
+                <h3 class="grp-collapse-handler">{{ top_node_info.name }} - {{ top_node_info.identifier_uid }}</h3>
+                {% context_dict_lookup 'top_level_iobject_id__2__matching_obj_ids' top_node as matching_list %}
+                {% for match in matching_list %}
+                    <div class="grp-module grp-collapse grp-closed">
+                        {% context_dict_lookup 'iobject_id__2__matching_io2v' match as io2v_match %}
+                        <h4 class="grp-collapse-handler">
+                            {% if io2v_match.0.attribute %}
+                               {{  io2v_match.0.term }}@{{  io2v_match.0.attribute }}
+                            {% else %}
+                               {{  io2v_match.0.term }} = {{  io2v_match.0.value }}
                             {% endif %}
-                        {% endfor %}
-
-
-                    </td>
-                </tr>
+                        </h4>
+                        <table class="grp-full-width">
+                            <tr class="grp-row">
+                                <td>Matched IObject</td>
+                                <td>Found in</td>
+                            </tr>
+                            <tr class="grp-row">
+                                <td>
+                                    {% for match in io2v_match %}
+                                        {{ match.iobject_name }} - {{ match.iobject_identifier_uid }}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% context_dict_lookup 'fact_id__2__io2vf_oi' io2v_match.0.fact_id as objects_oi %}
+                                    {% for obj_oi in objects_oi %}
+                                        {{ obj_oi.iobject_name }} - {{ obj_oi.iobject_identifier_uid }}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 {% endfor %}
-        </table>
+            </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock left_column %}
@@ -161,6 +133,20 @@
                 </div>
             {% endif %}
         {% endblock %}
-
     </div>
+{% endblock %}
+
+{% block extrahead %}
+    <script type="text/javascript" charset="utf-8">
+        (function ($) {
+            $(document).ready(function () {
+
+                (function ($) {
+                    $(document).ready(function () {
+                        $("#grp-content-container .grp-collapse").grp_collapsible();
+                    });
+                })(grp.jQuery);
+            });
+        })(grp.jQuery);
+    </script>
 {% endblock %}

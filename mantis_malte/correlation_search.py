@@ -6,9 +6,9 @@ from dingos.core.utilities import set_dict
 
 from . import DEFAULT_ASSIGNMENT
 
-exclude_facts = [{'term': "Properties/Address_Value",
+exclude_facts = [{'term': "Properties/Hashes/Hash/Simple_Hash_Value",
                 'attribute': "",
-                'value': "174.34.133.248"}
+                'value': ""}
                 ]
 
 if exclude_facts:
