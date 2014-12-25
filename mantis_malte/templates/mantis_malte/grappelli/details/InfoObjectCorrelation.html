@@ -1,6 +1,12 @@
 {% extends "dingos/grappelli/lists/base_lists_two_column.html" %}
 
 {% load dingos_tags %}
+{% load static %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="{% static 'mantis_malte/css/mantis_malte.css' %}" rel="stylesheet" type="text/css" media="screen" />
+{% endblock %}
 
 {% block title %}
     {{ object.iobject_type.name }}
@@ -16,13 +22,13 @@
     {% show_InfoObjectIDData object %}
     <div class="grp-module grp-collapse grp-closed">
         <h2 class="grp-collapse-handler">Correlations (Grouped by correlated fact)</h2>
-        {% for matching_io2fv in matching_io2fvs %}
+        {% for fact_id,matching_io2vfs in fact_id__2__matching_io2vf.items %}
         <div class="grp-module grp-collapse grp-closed">
             <h3 class="grp-collapse-handler">
-                {% if matching_io2fv.attribute %}
-                   {{ matching_io2fv.term }}@{{ matching_io2fv.attribute }}
+                {% if matching_io2vfs.0.attribute %}
+                   {{ matching_io2vfs.0.term }}@{{ matching_io2vfs.0.attribute }}
                 {% else %}
-                   {{ matching_io2fv.term }} = {{ matching_io2fv.value }}
+                   {{ matching_io2vfs.0.term }} = {{ matching_io2vfs.0.value }}
                 {% endif %}
             </h3>
             <table class="grp-full-width">
@@ -32,33 +38,57 @@
                     <td>Referenced from</td>
                 </tr>
                 <tr class="grp-row">
-                    <td>
-                    {% for obj_oi in matching_io2fv.objects_oi %}
+                    <td rowspan="{{ matching_io2vfs|length }}">
+                    {% context_dict_lookup 'fact_id__2__io2vf_oi' fact_id as objs_oi %}
+                    {% for obj_oi in objs_oi %}
                         <a href="{%url 'url.dingos.view.infoobject' pk=obj_oi.iobject_id %}">
                             {% show_namespace_image obj_oi.iobject_identifier_uri height='25' %}:{{ obj_oi.iobject_identifier_uid }}</a>
                         <br/>
                         {{ obj_oi.iobject_name }}
                     {% endfor %}
                     </td>
-                    <td>
-                        <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
-                            {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
-                        <br/>
-                        {{ matching_io2fv.iobject_name }}
-                    </td>
-                    <td>
+                    {% for matching_io2fv in matching_io2vfs %}
+                        {% if forloop.first %}
+                            <td>
+                                <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
+                                {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
+                                <br/>
+                                {{ matching_io2fv.iobject_name }}
+                            </td>
+                            <td>
+                                {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
 
-                        {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
+                                {% for node in node_list %}
+                                    {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
+                                    <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
+                                    {{ node_info.name }}
+                                    {% if not forloop.last %},<br/>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>
+                                    <a href="{%url 'url.dingos.view.infoobject' pk=matching_io2fv.iobject_id %}">
+                                    {% show_namespace_image matching_io2fv.iobject_identifier_uri height='25' %}:{{ matching_io2fv.iobject_identifier_uid }}</a>
+                                    <br/>
+                                    {{ matching_io2fv.iobject_name }}
+                                </td>
+                                <td>
+                                    {% context_dict_lookup 'matching_iobject_id__2__top_level_object_ids' matching_io2fv.iobject_id  as node_list %}
 
-                        {% for node in node_list %}
-                            {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
-                            <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
-                            {{ node_info.name }}
-                            {% if not forloop.last %},<br/>
-                            {% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
+                                    {% for node in node_list %}
+                                        {% context_dict_lookup 'top_level_iobject_id__2__node_info' node  as node_info %}
+                                        <a href="{%url 'url.dingos.view.infoobject' pk=node %}">{% show_namespace_image node_info.identifier_ns height='25' %}:{{ node_info.identifier_uid }}</a>
+                                        {{ node_info.name }}
+                                        {% if not forloop.last %},<br/>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
             </table>
         </div>
         {% endfor %}
@@ -69,7 +99,13 @@
 
         {% for top_node,top_node_info in top_level_iobject_id__2__node_info.items %}
             <div class="grp-module grp-collapse grp-closed">
-                <h3 class="grp-collapse-handler">{{ top_node_info.name }} - {{ top_node_info.identifier_uid }}</h3>
+                <h3 class="grp-collapse-handler">
+                    {% show_namespace_image top_node_info.identifier_ns height='25' %}:{{ top_node_info.identifier_uid }}
+                    {{ top_node_info.name }}
+                    <a href="{%url 'url.dingos.view.infoobject' pk=top_node %}" class="stay-inline">
+                      <img src="/static/admin/img/selector-search.gif" alt="Lookup" height="16" width="16" class="stay-inline">
+                    </a>
+                </h3>
                 {% context_dict_lookup 'top_level_iobject_id__2__matching_obj_ids' top_node as matching_list %}
                 {% for match in matching_list %}
                     <div class="grp-module grp-collapse grp-closed">
@@ -89,13 +125,19 @@
                             <tr class="grp-row">
                                 <td>
                                     {% for match in io2v_match %}
-                                        {{ match.iobject_name }} - {{ match.iobject_identifier_uid }}
+                                        <a href="{%url 'url.dingos.view.infoobject' pk=match.iobject_id %}">
+                                        {% show_namespace_image match.iobject_identifier_uri height='25' %}:{{ match.iobject_identifier_uid }}</a>
+                                        <br/>
+                                        {{ match.iobject_name }}
                                     {% endfor %}
                                 </td>
                                 <td>
                                     {% context_dict_lookup 'fact_id__2__io2vf_oi' io2v_match.0.fact_id as objects_oi %}
                                     {% for obj_oi in objects_oi %}
-                                        {{ obj_oi.iobject_name }} - {{ obj_oi.iobject_identifier_uid }}
+                                        <a href="{%url 'url.dingos.view.infoobject' pk=obj_oi.iobject_id %}">
+                                            {% show_namespace_image obj_oi.iobject_identifier_uri height='25' %}:{{ obj_oi.iobject_identifier_uid }}</a>
+                                        <br/>
+                                        {{ obj_oi.iobject_name }}
                                     {% endfor %}
                                 </td>
                             </tr>

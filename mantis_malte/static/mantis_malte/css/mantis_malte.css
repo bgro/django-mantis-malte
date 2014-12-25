@@ -1,25 +1,13 @@
-/**helpers**/
-.border-top {
-    border-top: solid #000 1px;
-}
-
-.border-right {
-    border-right: solid #000 1px;
-}
-
-.border-bottom {
-    border-bottom: solid #000 1px;
-}
-
-.border-left {
-    border-left: solid #000 1px;
-}
-
-/**correlation view/edit**/
-#weight-edit, #correlation-view  {
+/**FactTerm Weight Edit**/
+#weight-edit {
     width:70%;
 }
 
 input[id$="fact_term"] {
     width: 100%;
+}
+
+/**Fix grappelli iobject link image not to break**/
+.grp-collapse.grp-closed > .grp-collapse-handler .stay-inline {
+    display: inline !important;
 }
