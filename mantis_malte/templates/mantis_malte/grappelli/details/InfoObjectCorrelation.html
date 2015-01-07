@@ -20,7 +20,7 @@
 {% block left_column %}
 <div id="correlation-view">
     {% show_InfoObjectIDData object %}
-    <div class="grp-module grp-collapse grp-closed">
+    <div class="grp-module grp-collapse grp-open">
         <h2 class="grp-collapse-handler">Correlations (Grouped by correlated fact)</h2>
         {% for fact_id,matching_io2vfs in fact_id__2__matching_io2vf.items %}
         <div class="grp-module grp-collapse grp-closed">
@@ -94,11 +94,11 @@
         {% endfor %}
     </div>
 
-    <div class="grp-module grp-collapse grp-closed">
+    <div class="grp-module grp-collapse grp-open">
         <h2 class="grp-collapse-handler">Correlations (Grouped by top-level-element)</h2>
 
         {% for top_node,top_node_info in top_level_iobject_id__2__node_info.items %}
-            <div class="grp-module grp-collapse grp-closed">
+            <div class="grp-module grp-collapse grp-open">
                 <h3 class="grp-collapse-handler">
                     {% show_namespace_image top_node_info.identifier_ns height='25' %}:{{ top_node_info.identifier_uid }}
                     {{ top_node_info.name }}

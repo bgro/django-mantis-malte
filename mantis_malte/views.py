@@ -229,29 +229,29 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
 
         context["top_level_iobject_id__2__node_info"] = top_level_iobject_id__2__node_info
 
-        print "############### fact_id__2__io2vf_oi"
-        for e in fact_id__2__io2vf_oi.items():
-            print e
-
-        print "############### iobject_id__2__io2vf_oi"
-        for e in iobject_id__2__io2vf_oi.items():
-            print e
-
-        print "############### fact_id__2__matching_io2vf"
-        for e in fact_id__2__matching_io2vf.items():
-            print e
-
-        print "############### iobject_id__2__matching_io2v"
-        for e in iobject_id__2__matching_io2v.items():
-            print e
-
-        print "############### top_level_iobject_id__2__matching_obj_ids"
-        for e in top_level_iobject_id__2__matching_obj_ids.items():
-            print e
-
-        print "############### top_level_iobject_id__2__node_info"
-        for e in top_level_iobject_id__2__node_info.items():
-            print e
+        # print "############### fact_id__2__io2vf_oi"
+        # for e in fact_id__2__io2vf_oi.items():
+        #     print e
+        #
+        # print "############### iobject_id__2__io2vf_oi"
+        # for e in iobject_id__2__io2vf_oi.items():
+        #     print e
+        #
+        # print "############### fact_id__2__matching_io2vf"
+        # for e in fact_id__2__matching_io2vf.items():
+        #     print e
+        #
+        # print "############### iobject_id__2__matching_io2v"
+        # for e in iobject_id__2__matching_io2v.items():
+        #     print e
+        #
+        # print "############### top_level_iobject_id__2__matching_obj_ids"
+        # for e in top_level_iobject_id__2__matching_obj_ids.items():
+        #     print e
+        #
+        # print "############### top_level_iobject_id__2__node_info"
+        # for e in top_level_iobject_id__2__node_info.items():
+        #     print e
 
 
         return context
