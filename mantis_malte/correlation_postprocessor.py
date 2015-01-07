@@ -13,6 +13,8 @@ import networkx as nx
 from . import DEFAULT_ASSIGNMENT
 from .correlation_search import get_matching_io2fvs
 
+MAX_DISPLAY_NODES = 200
+
 def process(graph,**kwargs):
     """
     Given a graph, calculate a graph showing correlation information.
@@ -128,10 +130,12 @@ def process(graph,**kwargs):
 
 
             node_ids = list(dfs_preorder_nodes(reachability_graph, source=io2fv.iobject_id))
+
             for id in node_ids:
                 node = corr_graph.node[id]
                 #if "STIX_Package" in node['iobject_type']:
-                if node['iobject_type'] in ["Indicator", "STIX_Package"]:
+                if (len(very_concise_graph.nodes()) < MAX_DISPLAY_NODES and
+                                node['iobject_type'] in ["Indicator", "STIX_Package"]):
                     concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
                     concise_graph.add_edge(id,io2fv.iobject_id)
 
@@ -139,19 +143,18 @@ def process(graph,**kwargs):
                         very_concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
                         very_concise_graph.add_edge(root,id,correlation=True)
 
+
     corr_graph = stix_standard_postprocessor.process(corr_graph)
 
-    if unfolding == 'minimal':
-        return very_concise_graph
-    elif unfolding == 'concise':
-        return concise_graph
-    elif unfolding == 'full':
+    if len(very_concise_graph.nodes()) < MAX_DISPLAY_NODES:
+        very_concise_graph.graph['max_nodes_reached']= MAX_DISPLAY_NODES
+
+
+    if unfolding in ['full','auto'] and len(corr_graph.nodes()) < MAX_DISPLAY_NODES:
         return corr_graph
+    elif unfolding in ['concise','auto'] and len(concise_graph.nodes()) < MAX_DISPLAY_NODES:
+        return concise_graph
     else:
-        if len(corr_graph.nodes()) < 200:
-            return corr_graph
-        elif len(concise_graph.nodes()) < 200:
-            return concise_graph
-        else:
-            return very_concise_graph
+        return very_concise_graph
+
 
