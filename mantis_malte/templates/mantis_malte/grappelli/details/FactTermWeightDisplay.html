@@ -1,0 +1,43 @@
+{% extends "mantis_malte/grappelli/base.html" %}
+
+{% load dingos_tags %}
+
+{% block title %}
+    {{ view.title }}
+{% endblock %}
+
+{% block content_title %}
+  <h1>{{ view.title }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="grp-group grp-tabular" id="weight-view">
+        <h2>H2 Headline</h2>
+        <div class="grp-module grp-table">
+            <div class="grp-module grp-thead">
+                <div class="grp-tr">
+                    {% for head in view.col_head %}
+                      <div class="grp-th">{{ head }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% for term,weight in view.fact_terms %}
+                <div class="grp-module grp-tbody">
+                    <div class="grp-tr">
+                        <div class="grp-td">
+                            {{ term }}
+                        </div>
+                        <div class="grp-td">
+                            {{ weight }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="grp-module">
+            {% if view.is_paginated %}
+                {%  render_paginator  %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

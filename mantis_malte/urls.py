@@ -10,7 +10,7 @@ urlpatterns = patterns('',
         views.InfoObjectCorrelationView.as_view(),
         name="url.mantis_malte.view.corr.infoobject"),
 
-    url(r'^Admin/CorrelationWeights/?$',
+    url(r'^Admin/CorrelationWeights/(?P<assignment_name>[a-zA-Z0-9_]+)?/?$',
         views.FactTermWeightEdit.as_view(),
         name="url.mantis_malte.view.corr.config"),
     )

@@ -166,6 +166,9 @@
                                         <td>{{ field.errors }} {{ field }}</td>
                                     </tr>
                             {% endfor %}
+                            <tr>
+                              <td colspan="2"><a href="/mantis/Admin/CorrelationWeights/{{ view.assignment }}">Current Assignment Name: {{ view.assignment }}</a></td>
+                            </tr>
                             </tbody>
                         </table>
                         <div style="padding-top:10px;text-align:right;">

@@ -20,8 +20,6 @@ from .forms import FactTermCorrelationEditForm, CorrelationViewForm
 from .models import FactTerm2Weight, AssignmentName
 from .correlation_search import get_matching_io2fvs
 
-
-
 class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
 
     # make sure that the default assignment exists
@@ -33,8 +31,6 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
 
     form_class = formset_factory(FactTermCorrelationEditForm, extra=0)
     formset = None
-
-
 
     #TODO set title
     title = 'Title Test'
@@ -48,13 +44,21 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
         return context
 
     def get(self, request, *args, **kwargs):
+        assignment_name = kwargs.get('assignment_name',None)
         initial = []
         self.page = request.GET.get('page')
 
-        columns = ['id','term','attribute','weight_set__assignment_name__name','weight_set__weight']
+        if assignment_name:
+            columns = ['fact_term__term','fact_term__attribute','weight']
+            factterm_weight_q = FactTerm2Weight.objects.filter(assignment_name__name = assignment_name).select_related('fact_term').values(*columns)
+            self.template_name = 'mantis_malte/%s/details/FactTermWeightDisplay.html' % MANTIS_MALTE_TEMPLATE_FAMILY
+            self.titel = 'Assigment Name %s' % (assignment_name)
+            self.factterms_paginator = Paginator(factterm_weight_q, ELEMENTS_PER_PAGE)
 
-        factterm_list = self.get_queryset().values(*columns).order_by('term')
-        self.factterms_paginator = Paginator(factterm_list, ELEMENTS_PER_PAGE)
+        else:
+            columns = ['id','term','attribute','weight_set__assignment_name__name','weight_set__weight']
+            factterm_list = self.get_queryset().values(*columns).order_by('term')
+            self.factterms_paginator = Paginator(factterm_list, ELEMENTS_PER_PAGE)
 
         if self.factterms_paginator.num_pages == 1:
             self.is_paginated = False
@@ -70,22 +74,30 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
             # If page is out of range, deliver last page of results.
             self.factterms = self.factterms_paginator.page(self.factterms_paginator.num_pages)
 
-        self.fact_terms = OrderedDict()
-        for fact_term in self.factterms:
-            curr_factterm = self.fact_terms.get(fact_term['id'],False)
-            if curr_factterm:
-                curr_factterm['weights'].append("%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight']))
-            else:
-                self.fact_terms[fact_term['id']] = {
-                'term' : "%s@%s" % (fact_term['term'], fact_term['attribute']) if fact_term['attribute'] else "%s" % (fact_term['term']),
-                'weights' : ["%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight'])]
-                }
-        for factterm_id in self.fact_terms.keys():
-            initial.append({
-                'factterm' : factterm_id
-            })
-
-        self.formset = self.form_class(initial=initial)
+        if assignment_name:
+            self.col_head = ['Fact Term','Weight']
+            self.fact_terms = []
+            for fact_term in self.factterms:
+                self.fact_terms.append(
+                    ("%s@%s" % (fact_term['fact_term__term'], fact_term['fact_term__attribute']) if fact_term['fact_term__attribute'] else "%s" % (fact_term['fact_term__term']),
+                    fact_term['weight'])
+                )
+        else:
+            self.fact_terms = OrderedDict()
+            for fact_term in self.factterms:
+                curr_factterm = self.fact_terms.get(fact_term['id'],False)
+                if curr_factterm:
+                    curr_factterm['weights'].append("%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight']))
+                else:
+                    self.fact_terms[fact_term['id']] = {
+                    'term' : "%s@%s" % (fact_term['term'], fact_term['attribute']) if fact_term['attribute'] else "%s" % (fact_term['term']),
+                    'weights' : ["%s: %s" % (fact_term['weight_set__assignment_name__name'],fact_term['weight_set__weight'])]
+                    }
+            for factterm_id in self.fact_terms.keys():
+                initial.append({
+                    'factterm' : factterm_id
+                })
+            self.formset = self.form_class(initial=initial)
 
         return super(FactTermWeightEdit, self).get(request, *args, **kwargs)
 
@@ -228,31 +240,6 @@ class InfoObjectCorrelationView(CommonContextMixin, ViewMethodMixin, LoginRequir
         context["top_level_iobject_id__2__matching_obj_ids"] = top_level_iobject_id__2__matching_obj_ids
 
         context["top_level_iobject_id__2__node_info"] = top_level_iobject_id__2__node_info
-
-        # print "############### fact_id__2__io2vf_oi"
-        # for e in fact_id__2__io2vf_oi.items():
-        #     print e
-        #
-        # print "############### iobject_id__2__io2vf_oi"
-        # for e in iobject_id__2__io2vf_oi.items():
-        #     print e
-        #
-        # print "############### fact_id__2__matching_io2vf"
-        # for e in fact_id__2__matching_io2vf.items():
-        #     print e
-        #
-        # print "############### iobject_id__2__matching_io2v"
-        # for e in iobject_id__2__matching_io2v.items():
-        #     print e
-        #
-        # print "############### top_level_iobject_id__2__matching_obj_ids"
-        # for e in top_level_iobject_id__2__matching_obj_ids.items():
-        #     print e
-        #
-        # print "############### top_level_iobject_id__2__node_info"
-        # for e in top_level_iobject_id__2__node_info.items():
-        #     print e
-
 
         return context
 
