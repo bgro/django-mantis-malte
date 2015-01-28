@@ -1,0 +1,28 @@
+ <div class="grp-module grp-collapse grp-open">
+     <h2 class="grp-collapse-handler">Correlated Fact-Terms</h2>
+  <div class="grp-tabular" id="weight-view">
+
+        <div class="grp-table">
+            <div class="grp-thead">
+                <div class="grp-tr">
+
+                      <div class="grp-th">Fact-Term</div>
+                    <div class="grp-th">Weight</div>
+
+                </div>
+            </div>
+            {% for term,weight in fact_terms %}
+                <div class="grp-tbody">
+                    <div class="grp-tr">
+                        <div class="grp-td">
+                            {{ term }}
+                        </div>
+                        <div class="grp-td">
+                            {{ weight }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+  </div>
+ </div>

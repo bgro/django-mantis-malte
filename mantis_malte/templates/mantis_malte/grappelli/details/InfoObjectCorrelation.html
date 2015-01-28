@@ -1,6 +1,7 @@
 {% extends "dingos/grappelli/lists/base_lists_two_column.html" %}
 
 {% load dingos_tags %}
+{% load malte_tags %}
 {% load static %}
 
 {% block stylesheets %}
@@ -166,9 +167,7 @@
                                         <td>{{ field.errors }} {{ field }}</td>
                                     </tr>
                             {% endfor %}
-                            <tr>
-                              <td colspan="2"><a href="/mantis/Admin/CorrelationWeights/{{ view.assignment }}">Current Assignment Name: {{ view.assignment }}</a></td>
-                            </tr>
+
                             </tbody>
                         </table>
                         <div style="padding-top:10px;text-align:right;">
@@ -179,6 +178,7 @@
             {% endif %}
         {% endblock %}
     </div>
+    {% show_CorrelationSchema view.assignment %}
 {% endblock %}
 
 {% block extrahead %}

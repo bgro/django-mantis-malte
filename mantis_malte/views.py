@@ -22,6 +22,8 @@ from .correlation_search import get_matching_io2fvs
 
 class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
 
+    title = "Maintenance of weights for correlation"
+
     # make sure that the default assignment exists
     AssignmentName.objects.get_or_create(name=DEFAULT_ASSIGNMENT)
 
@@ -32,8 +34,7 @@ class FactTermWeightEdit(LoginRequiredMixin, ViewMethodMixin, ListView):
     form_class = formset_factory(FactTermCorrelationEditForm, extra=0)
     formset = None
 
-    #TODO set title
-    title = 'Title Test'
+
 
     def get_context_data(self, **kwargs):
         context = super(FactTermWeightEdit, self).get_context_data(**kwargs)
