@@ -20,6 +20,7 @@ exclude_facts = [{'term': "Properties/Hashes/Hash/Simple_Hash_Value",
                 'value': "autoexec.bat"}
                 ]
 
+# The code below does not work on julia... investigate...
 if exclude_facts:
     facts_to_exclude_qs = vIO2FValue.objects.distinct('fact_id').values_list('fact_id', flat=True)
     for fact in exclude_facts:
@@ -70,11 +71,11 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASS
         .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
 
     #fetch facts to exclude at server startup
-    if True:
+    if False:
         io2fvs_of_interest = io2fvs_of_interest.exclude(fact_id__in=FACTS_TO_EXCLUDE)
 
     #exclude facts per query by filtering
-    if False:
+    if True:
         #excluding facts configured in exclude_facts
         for fact in exclude_facts:
             io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],
