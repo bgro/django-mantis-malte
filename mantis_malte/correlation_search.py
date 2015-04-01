@@ -25,9 +25,19 @@ from . import DEFAULT_ASSIGNMENT
 
 exclude_facts = [{'term': "Properties/Hashes/Hash/Simple_Hash_Value",
                 'attribute': "",
-                'value': ""}
+                'value': "d41d8cd98f00b204e9800998ecf8427e"},
+                 {'term': "Properties/Hashes/Hash/Simple_Hash_Value",
+                  'attribute': "",
+                  'value': "da39a3ee5e6b4b0d3255bfef95601890afd80709"},
+                 {'term': "Properties/Hashes/Hash/Simple_Hash_Value",
+                  'attribute': "",
+                'value': "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+                 {'term': "Properties/File_Name",
+                  'attribute': "",
+                'value': "autoexec.bat"}
                 ]
 
+# The code below does not work on julia... investigate...
 if exclude_facts:
     facts_to_exclude_qs = vIO2FValue.objects.distinct('fact_id').values_list('fact_id', flat=True)
     for fact in exclude_facts:
@@ -78,11 +88,11 @@ def get_matching_io2fvs(pks=None,graph=None,threshold=0.5,assignment=DEFAULT_ASS
         .filter(factterm__weight_set__weight__gte=threshold,factterm__weight_set__assignment_name__name=assignment)
 
     #fetch facts to exclude at server startup
-    if True:
+    if False:
         io2fvs_of_interest = io2fvs_of_interest.exclude(fact_id__in=FACTS_TO_EXCLUDE)
 
     #exclude facts per query by filtering
-    if False:
+    if True:
         #excluding facts configured in exclude_facts
         for fact in exclude_facts:
             io2fvs_of_interest = io2fvs_of_interest.exclude(term=fact['term'],

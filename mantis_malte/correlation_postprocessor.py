@@ -56,8 +56,6 @@ def process(graph,**kwargs):
       (STIX packages or whatever) referencing the matched objects.
     """
 
-    print kwargs
-
     unfolding = kwargs.get('unfolding','auto')
 
     root = graph.graph['root']
@@ -156,8 +154,9 @@ def process(graph,**kwargs):
                     concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
                     concise_graph.add_edge(id,io2fv.iobject_id)
 
-                    very_concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
-                    very_concise_graph.add_edge(root,id,correlation=True)
+                    if len(very_concise_graph.nodes())< 200:
+                        very_concise_graph.add_node(id,attr_dict = reachability_graph.node[id])
+                        very_concise_graph.add_edge(root,id,correlation=True)
 
 
     corr_graph = stix_standard_postprocessor.process(corr_graph)
