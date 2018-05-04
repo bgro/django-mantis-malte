@@ -2,6 +2,13 @@
 Mantis MALTE
 =============================
 
+**WARNING: Mantis is not maintained anymore: by now, the excellent MISP platform
+(http://www.misp-project.org/)
+offers all the functionality (and much more) that had been required when
+MANTIS was created but could then not be found in any other tool.**
+
+
+
 .. image:: https://badge.fury.io/py/django-mantis-malte.png
     :target: https://badge.fury.io/py/django-mantis-malte
 
